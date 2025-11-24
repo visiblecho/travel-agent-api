@@ -5,10 +5,11 @@ import 'dotenv/config'
 // Middlware
 import morgan from 'morgan'
 import cors from 'cors'
+import errorHandler from './middleware/errorHandler.js'
 
 const app = express()
 
-// * Routers 
+// * Routers
 import authController from './controllers/auth.js'
 
 // Middleware
@@ -18,6 +19,9 @@ app.use(morgan('dev'))
 
 // * Routes
 app.use('/auth', authController)
+
+// * Handle all errors thrown in the routes
+app.use(errorHandler)
 
 // Connections
 const connect = async (req, res) => {
