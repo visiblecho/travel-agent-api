@@ -11,18 +11,18 @@ router.post('/sign-up', async (req, res, next) => {
     try {
         const { username, email, password, confirmPassword } = req.body
         if (!username || !email || !password) {
-            throw new BadRequest('All fields are required')
+            throw new BadRequest({message: 'All fields are required'})
         }
         if (password !== confirmPassword) {
-            throw new BadRequest('Passwords must match')
+            throw new BadRequest({confirmPassword: 'Passwords must match'})
         }
         const existingUsername = await User.findOne({username})
         if (existingUsername) {
-            throw new BadRequest('Username already taken')
+            throw new BadRequest({username: 'Username already taken'})
         }
         const existingEmail = await User.findOne({email})
         if(existingEmail) {
-            throw new BadRequest('Email already taken')
+            throw new BadRequest({email: 'Email already taken'})
         }
         const user = await User.create(req.body)
         return res.status(201).json(user)
