@@ -39,11 +39,11 @@ router.post('/sign-in', async (req, res) => {
         throw new BadRequest('Username and password are required')
     const userToLogIn = await User.findOne({ username: username })
     if (!userToLogIn) {
-        throw new NotFound('User does not exist')
+        throw new NotFound({username: 'User does not exist'})
     }
     const passwordMatch = bcrypt.compareSync(password, userToLogIn.password)
     if (!passwordMatch) {
-        throw new Unauthorized('Unauthorized')
+        throw new Unauthorized({password: 'Unauthorized'})
     }
     const token = jwt.sign(
         { user: { _id: userToLogIn._id, username: userToLogIn.username} },
