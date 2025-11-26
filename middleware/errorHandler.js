@@ -13,7 +13,7 @@ const logError = (msg) => {
 }
 
 const errorHandler = (error, req, res, next) => {
-  const message = {
+  const backendDetails = {
     status: error.status || 500,
     code: error.code || 0,
     name: error.name || 'Generic internal server error',
@@ -25,39 +25,54 @@ const errorHandler = (error, req, res, next) => {
 
   // Unique constraint (from Mongoose if a value is passed to the schema that must be unique)
   if (error.code === 11000) {
-    message.status = 400
-    message.code = 1
-    message.name = 'Value not unique'
-    message.description =
+    backendDetails.status = 400
+    backendDetails.code = 1
+    backendDetails.name = 'Value not unique'
+    backendDetails.description =
       'Duplicate value provided for a field that must be unique'
-    message.repair = 'Provide a different value'
+    backendDetails.repair = 'Provide a different value'
   }
 
   // Cast Error (from Express if the route cannot be cast)
   if (error.name === 'CastError' && error.kind === 'ObjectId') {
-    message.status = 404
-    message.code = 2
-    message.name = 'Not found'
-    message.description = 'The requested resource could not be located.'
-    message.repair =
+    backendDetails.status = 404
+    backendDetails.code = 2
+    backendDetails.name = 'Not found'
+    backendDetails.description = 'The requested resource could not be located.'
+    backendDetails.repair =
       'Verify that the resource identifier is correct. If the resource does not exist, create it before retrying.'
   }
 
   // Validation Error (from Mongoose if invalid date is passed to the schema)
   if (error.name === 'ValidationError') {
-    message.status = 400
-    message.code = 3
-    message.name = 'Invalid data'
-    message.description = 'Data provided is invalid for the resource.'
-    message.repair =
+    backendDetails.status = 400
+    backendDetails.code = 3
+    backendDetails.name = 'Invalid data'
+    backendDetails.description = 'Data provided is invalid for the resource.'
+    backendDetails.repair =
       'Ensure that all values meet the resource schema definition.'
   }
 
+  let frontendMessage = {}
+
+  if (error.payload) {
+    if (typeof error.payload === 'object' && !error.payload.message) {
+      frontendMessage = error.payload
+    } else if (error.payload.message) {
+      frontendMessage = { message: error.payload.message }
+    } else if (typeof error.payload === 'string') {
+      frontendMessage = { message: error.payload}
+    }
+  } else {
+    frontendMessage = { message: error.message || 'An error occured'}
+  }
   // Nice error formatting for production use, not enough detail during development
   // logError(message)
-  console.error(error)
+  console.error(backendDetails)
+  return res.status(backendDetails.status).json({
+    error: frontendMessage
+  })
 
-  res.status(message.status).json(message)
 }
 
 export default errorHandler
