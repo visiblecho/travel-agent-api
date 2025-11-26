@@ -1,9 +1,51 @@
 import mongoose from 'mongoose'
+import { sanitizeAndNormalizeUrl } from '../utils/urlSanitizer.js'
 
 const activitySchema = new mongoose.Schema({
   title: { type: String, required: true },
   description: { type: String },
-  date: { type: Date },
+  location: { type: String },
+  mapUrl: {
+    type: String,
+    set: (value) => sanitizeAndNormalizeUrl(value),
+    validate: {
+      validator: function (v) {
+        return v !== null
+      },
+      message: (props) => `${props.value} is not a valid URL`
+    }
+  },
+
+  startDate: { type: Date },
+  endDate: {
+    type: Date,
+    validate: {
+      validator: function (value) {
+        return !value || value <= this.startDate
+      },
+      message: 'End date must not be after start date',
+    },
+  },
+  websiteUrl: {
+    type: String,
+    set: (value) => sanitizeAndNormalizeUrl(value),
+    validate: {
+      validator: function (v) {
+        return v !== null
+      },
+      message: (props) => `${props.value} is not a valid URL`,
+    },
+  },
+  imageUrl: {
+    type: String,
+    set: (value) => sanitizeAndNormalizeUrl(value, true),
+    validate: {
+      validator: function (v) {
+        return v !== null
+      },
+      message: (props) => `${props.value} is not a valid image URL`,
+    },
+  },
 })
 
 const tripSchema = new mongoose.Schema({
@@ -14,10 +56,17 @@ const tripSchema = new mongoose.Schema({
   },
   title: { type: String, required: true },
   description: { type: String },
-  destination: { type: String, required: true },
-  country: { type: String },
-  startDate: { type: Date, required: true },
-  endDate: { type: Date, required: true },
+  location: { type: String },
+  startDate: { type: Date },
+  endDate: {
+    type: Date,
+    validate: {
+      validator: function (value) {
+        return !value || value <= this.startDate
+      },
+      message: 'End date must not be after start date',
+    },
+  },
   activities: [activitySchema],
 })
 
