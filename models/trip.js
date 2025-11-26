@@ -7,15 +7,11 @@ const activitySchema = new mongoose.Schema({
   location: { type: String },
   mapUrl: {
     type: String,
-    set: (value) => sanitizeAndNormalizeUrl(value),
-    validate: {
-      validator: function (v) {
-        return v !== null
-      },
-      message: (props) => `${props.value} is not a valid URL`
-    }
+    set: (value) => {
+      if (!value || value === 'null') return undefined
+      return sanitizeAndNormalizeUrl(value)
+    },
   },
-
   startDate: { type: Date },
   endDate: {
     type: Date,
@@ -28,22 +24,16 @@ const activitySchema = new mongoose.Schema({
   },
   websiteUrl: {
     type: String,
-    set: (value) => sanitizeAndNormalizeUrl(value),
-    validate: {
-      validator: function (v) {
-        return v !== null
-      },
-      message: (props) => `${props.value} is not a valid URL`,
+    set: (value) => {
+      if (!value || value === 'null') return undefined
+      return sanitizeAndNormalizeUrl(value)
     },
   },
   imageUrl: {
     type: String,
-    set: (value) => sanitizeAndNormalizeUrl(value, true),
-    validate: {
-      validator: function (v) {
-        return v !== null
-      },
-      message: (props) => `${props.value} is not a valid image URL`,
+    set: (value) => {
+      if (!value || value === 'null') return undefined
+      return sanitizeAndNormalizeUrl(value)
     },
   },
 })
