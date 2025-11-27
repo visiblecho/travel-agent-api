@@ -20,9 +20,10 @@ const activitySchema = new mongoose.Schema({
     type: Date,
     validate: {
       validator: function (value) {
-        return !value || value <= this.startDate
+        if (!value || !this.startDate) return true
+        return this.startDate < value
       },
-      message: 'End date must not be after start date',
+      message: 'End date must be after start date',
     },
   },
   websiteUrl: {
@@ -48,9 +49,10 @@ const tripSchema = new mongoose.Schema({
     type: Date,
     validate: {
       validator: function (value) {
-        return !value || value <= this.startDate
+        if (!value || !this.startDate) return true
+        return this.startDate < value
       },
-      message: 'End date must not be after start date',
+      message: 'End date must be after start date',
     },
   },
   activities: [activitySchema],
