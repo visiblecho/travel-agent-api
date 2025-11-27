@@ -1,5 +1,8 @@
 import mongoose from 'mongoose'
+import z from 'zod'
 import { sanitizeAndNormalizeUrl } from '../utils/urlSanitizer.js'
+
+// * Mongoose schema and model for use with MongoDB ---------------------------
 
 const activitySchema = new mongoose.Schema({
   title: { type: String, required: true },
@@ -56,3 +59,24 @@ const tripSchema = new mongoose.Schema({
 const Trip = mongoose.model('Trip', tripSchema)
 
 export default Trip
+
+// * Zod schema (derived from above) for use with OpenaAI ---------------------
+
+export const activitySchemaZod = z.object({
+  title: z.string(),
+  description: z.string(),
+  location: z.string(),
+  mapUrl: z.string().describe('A valid URL'),
+  startDate: z.iso.datetime(),
+  endDate: z.iso.datetime(),
+  websiteUrl: z.string().describe('A valid URL'),
+})
+
+export const tripSchemaZod = z.object({
+  title: z.string(),
+  description: z.string(),
+  location: z.string(),
+  startDate: z.iso.datetime(),
+  endDate: z.iso.datetime(),
+  activities: z.array(activitySchemaZod),
+})
