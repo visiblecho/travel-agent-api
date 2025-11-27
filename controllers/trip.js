@@ -93,7 +93,7 @@ router.post('/:tripId/activities/', isSignedIn, async (req, res, next) => {
     const trip = await Trip.findById(tripId)
     if (!trip) throw new NotFound()
     if (!trip.owner.equals(req.user._id)) throw new Forbidden()
-    req.body.owner = req.user._id
+    // req.body.owner = req.user._id
     trip.activities.push(req.body)
     await trip.save()
     res.status(201).json(trip.activities)
