@@ -1,5 +1,8 @@
 import mongoose from 'mongoose'
+import z from 'zod'
 import { sanitizeAndNormalizeUrl } from '../utils/urlSanitizer.js'
+
+// * Mongoose schema and model for use with MongoDB ---------------------------
 
 const activitySchema = new mongoose.Schema({
   title: { type: String, required: true },
@@ -17,9 +20,10 @@ const activitySchema = new mongoose.Schema({
     type: Date,
     validate: {
       validator: function (value) {
-        return !value || value <= this.startDate
+        if (!value || !this.startDate) return true
+        return this.startDate < value
       },
-      message: 'End date must not be after start date',
+      message: 'End date must be after start date',
     },
   },
   websiteUrl: {
@@ -45,9 +49,10 @@ const tripSchema = new mongoose.Schema({
     type: Date,
     validate: {
       validator: function (value) {
-        return !value || value <= this.startDate
+        if (!value || !this.startDate) return true
+        return this.startDate < value
       },
-      message: 'End date must not be after start date',
+      message: 'End date must be after start date',
     },
   },
   activities: [activitySchema],
@@ -56,3 +61,24 @@ const tripSchema = new mongoose.Schema({
 const Trip = mongoose.model('Trip', tripSchema)
 
 export default Trip
+
+// * Zod schema (derived from above) for use with OpenaAI ---------------------
+
+export const activitySchemaZod = z.object({
+  title: z.string(),
+  description: z.string(),
+  location: z.string(),
+  mapUrl: z.string().describe('A valid URL'),
+  startDate: z.iso.datetime(),
+  endDate: z.iso.datetime(),
+  websiteUrl: z.string().describe('A valid URL'),
+})
+
+export const tripSchemaZod = z.object({
+  title: z.string(),
+  description: z.string(),
+  location: z.string(),
+  startDate: z.iso.datetime(),
+  endDate: z.iso.datetime(),
+  activities: z.array(activitySchemaZod),
+})
