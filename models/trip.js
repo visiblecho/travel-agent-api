@@ -10,14 +10,17 @@ const activitySchema = new mongoose.Schema({
   location: { type: String },
   mapUrl: {
     type: String,
+    /*
     set: (value) => {
       if (!value || value === 'null') return undefined
       return sanitizeAndNormalizeUrl(value)
     },
+    */
   },
   startDate: { type: Date },
   endDate: {
     type: Date,
+    /*
     validate: {
       validator: function (value) {
         if (!value || !this.startDate) return true
@@ -25,6 +28,7 @@ const activitySchema = new mongoose.Schema({
       },
       message: 'End date must be after start date',
     },
+    */
   },
 })
 
@@ -40,6 +44,7 @@ const tripSchema = new mongoose.Schema({
   startDate: { type: Date },
   endDate: {
     type: Date,
+    /*
     validate: {
       validator: function (value) {
         if (!value || !this.startDate) return true
@@ -47,6 +52,7 @@ const tripSchema = new mongoose.Schema({
       },
       message: 'End date must be after start date',
     },
+    */
   },
   activities: [activitySchema],
 })
